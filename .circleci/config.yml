@@ -1,44 +1,18 @@
-# Couldn't automatically generate a config from your source code.
-# This is a generic template to serve as a base for your custom config
-# See: https://circleci.com/docs/configuration-reference
-# Stacks detected: deps:node:.
 version: 2.1
+orbs:
+  node: circleci/node:4.1.0 # Use the Node.js orb
 jobs:
   test:
-    docker:
-      - image: cimg/base:stable
+    executor:
+      name: node/default # Use the Node.js Docker image provided by the Node orb
+      tag: '18' # Specify the version of Node.js
     steps:
-      - checkout
-      # Replace this with a real test runner invocation
+      - checkout # Checkout your code
+      - node/install-packages # Install your dependencies
       - run:
-          name: Run tests
-          command: echo 'replace me with real tests!' && false
-  build:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - checkout
-      # Replace this with steps to build a package, or executable
-      - run:
-          name: Build an artifact
-          command: touch example.txt
-      - store_artifacts:
-          path: example.txt
-  deploy:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      # Replace this with steps to deploy to users
-      - run:
-          name: deploy
-          command: '#e.g. ./deploy.sh'
+          name: Run bot
+          command: node index.js # Replace with your bot file
 workflows:
-  example:
+  test_my_app:
     jobs:
       - test
-      - build:
-          requires:
-            - test
-      - deploy:
-          requires:
-            - test
