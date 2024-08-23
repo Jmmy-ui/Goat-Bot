@@ -1,18 +1,42 @@
 version: 2.1
 orbs:
-  node: circleci/node@5.3.0 # Use the Node.js orb
+  node: circleci/node@5.0.2
+  heroku: circleci/heroku@1.2.6
+
 jobs:
-  test:
-    executor:
-      name: node/default # Use the Node.js Docker image provided by the Node orb
-      tag: '18' # Specify the version of Node.js
+  build_and_test:
+    executor: node/default
     steps:
-      - checkout # Checkout your code
-      - node/install-packages # Install your dependencies
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
       - run:
-          name: Run bot
-          command: node index.js # Replace with your bot file
+          command: npm i
+          name: Run tests
+      - run:
+          command: npm start || node index.js
+          name: Build app
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - .
+
+  deploy: # this can be any name you choose
+    executor: heroku/default
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - heroku/deploy-via-git:
+          force: true # force push when pushing to the heroku remote, see: https://devcenter.heroku.com/articles/git
+
 workflows:
   test_my_app:
     jobs:
-      - test
+      - build_and_test
+      - deploy:
+          requires:
+            - build_and_test # only deploy if the build_and_test job has completed
+          filters:
+            branches:
+              only: main # only deploy when on main
+              
