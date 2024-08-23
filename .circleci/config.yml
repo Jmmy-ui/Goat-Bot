@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  node: circleci/node:4.1.0 # Use the Node.js orb
+  node: circleci/node@x.y # Use the Node.js orb
 jobs:
   test:
     executor:
